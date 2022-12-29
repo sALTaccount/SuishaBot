@@ -51,3 +51,9 @@ The format is `instance_name = 'http://ip:port/'`. The instance name that you ch
 ## Permissions and Rate Limits
 
 Permissions and rate limits are planned, but not completed yet.
+
+Currently, the only working permission is the ability to toggle DM access for all users
+
+### TODO
+ - Permissions and rate limits
+ - img2img

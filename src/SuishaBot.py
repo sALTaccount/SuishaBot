@@ -29,6 +29,26 @@ class Bot:
 
         params = config.config['command_params']
 
+        def stringify(queue_obj):
+            maps = {
+                'prompt': ('prompt', None),
+                'negative_prompt': ('negative_prompt', params['default_negative']),
+                'steps': ('steps', params['default_steps']),
+                'width': ('width', params['default_width']) ,
+                'height': ('height', params['default_height']),
+                'seed': ('seed', -1),
+                'cfg_scale': ('guidance_scale', params['default_cfg']),
+                'sampler_index': ('sampler', params['default_sampler']),
+                'enable_hr': ('highres_fix', False)
+            }
+            cmd_parts = ['/dream']
+            for item in queue_obj.args.items():
+                if item[0] in maps:
+                    # don't append if value is default
+                    if item[1] != maps[item[0]][1]:
+                        cmd_parts.append(f'{maps[item[0]][0]}: {item[1]}')
+            return ' '.join(cmd_parts)
+
         @instance.slash_command(name="dream", description="Generate an image")
         @option('prompt', str, description='The prompt for generating the image', required=True)
         @option('negative_prompt', str, description='', required=False)
@@ -52,6 +72,24 @@ class Bot:
                            guidance_scale: Optional[float] = params['default_cfg'],
                            sampler: Optional[str] = params['default_sampler'],
                            highres_fix: Optional[bool] = False):
+            # Check DM access perms
+            if ctx.channel.type.name == 'private':
+                perm_manager.can_dm(ctx.author)
+                embed = discord.Embed(title='DM Access Disabled',
+                                      description=f'You do not have permission to DM the bot',
+                                      color=0xEECCAA)
+                await ctx.respond(embed=embed, ephemeral=True)
+                return
+            # Check for banned words
+            search = prompt if config.config['blacklist']['allow_in_negative'] else ' '.join([prompt, negative_prompt])
+            for word in config.config['blacklist']['words']:
+                # remove punctuation from the prompt before searching
+                for word2 in search.translate(str.maketrans('', '', string.punctuation)).split():
+                    if word.lower() == word2.lower():
+                        print(f'Denied -- {ctx.author.name}#{ctx.author.discriminator} tried to use banned word {word}!')
+                        await ctx.respond(f'You tried to use a banned word! ({word})', ephemeral=True)
+                        return
+            # Process request
             print(f'Request -- {ctx.author.name}#{ctx.author.discriminator} -- Prompt: {prompt}')
             queue_obj = AutoWebUi.QueueObj(
                 event_loop=asyncio.get_event_loop(),
@@ -68,19 +106,12 @@ class Bot:
                     'enable_hr': highres_fix
                 }
             )
-            search = prompt if config.config['blacklist']['allow_in_negative'] else ' '.join([prompt, negative_prompt])
-            for word in config.config['blacklist']['words']:
-                # remove punctuation from the prompt before searching
-                for word2 in search.translate(str.maketrans('', '', string.punctuation)).split():
-                    if word.lower() == word2.lower():
-                        await ctx.respond(f'You tried to use a banned word! ({word})', ephemeral=True)
-                        return
-            # if ctx.channel.type.name == 'private':
-            #     perm_manager.can_dm(ctx.author)
+
             response, info = self.load_distributor.add_to_queue(queue_obj)
+
             if response == Status.QUEUED:
                 await ctx.respond(
-                    f'`Generating for {ctx.author.name}#{ctx.author.discriminator}` - `Queue Position: {info}`')
+                    f'`Generating for {ctx.author.name}#{ctx.author.discriminator}` - `Queue Position: {info}` - `command: {stringify(queue_obj).replace("`", "")}`')
             elif response == Status.IN_QUEUE:
                 embed = discord.Embed(title='Already in queue!',
                                       description=f'Please wait for your current image to finish generating before generating a new image\n'
@@ -101,21 +132,14 @@ class Suisha(discord.Bot, ABC):
         super().__init__(*args, **options)
 
     async def on_message(self, message):
-        if message.author == self.user:
-            try:
-                # Check if the message from Shanghai was actually a generation
-                if message.embeds[0].fields[0].name == 'Prompt':
-                    await message.add_reaction('❌')
-            except:
-                pass
-
-    async def _get_channel(self, channel_id: int):
-        channel = self.get_channel(channel_id)
-        if channel:
-            return channel
-        user = await self.get_or_fetch_user(channel_id)
-        if user.dm_channel:
-            return user
+        if message.channel.type.name != 'private':
+            if message.author == self.user:
+                try:
+                    # Check if the message from Shanghai was actually a generation
+                    if message.embeds[0].fields[0].name == 'Prompt':
+                        await message.add_reaction('❌')
+                except:
+                    pass
 
     async def on_raw_reaction_add(self, ctx):
         if ctx.emoji.name == '❌':

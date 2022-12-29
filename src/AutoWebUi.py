@@ -24,4 +24,12 @@ class WebUi:
         payload = queue_obj.args
         response = requests.post(url=endpoint, json=payload)
         r = response.json()
-        return r
+        return r, response.status_code
+
+    def heartbeat(self):
+        endpoint = urljoin(self._base_url, '/user/')
+        try:
+            r = requests.get(endpoint, timeout=10)
+            return r.status_code == 200
+        except:
+            return False
