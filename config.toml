@@ -1,0 +1,38 @@
+[webui_ips] # IPs to the instances of automatic webui
+webui1 = 'http://127.0.0.1:7860/'
+
+[ratelimit_roles] # gens per hour per role, set to -1 to disable ratelimit
+DEFAULT = -1 # ratelimit if no other ratelimit role is found
+# RATE LIMITS DO NOT WORK CURRENTLY
+
+[dm_access_roles] # roles that have DM access perms
+ALL = false # gives all users DM access
+# PER ROLE DM ACCESS DOESN'T WORK CURRENTLY
+
+[command_params]
+default_negative = 'lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, censored, 2009, 2010, 2011, 2012, 2013, 2014, 2015'
+default_cfg = 7
+
+default_width = 768
+min_width = 512
+max_width = 768
+
+default_height = 768
+min_height = 512
+max_height = 768
+
+default_steps = 50
+min_steps = 5
+max_steps = 60
+step_step = 5
+
+samplers = [
+            'Euler a', 'Euler', 'LMS', 'Heun', 'DPM2', 'DM2 a', 'DPM++ 2S a', 'DPM++ 2M', 'DPM++ SDE', 'DPM fast',
+            'DPM adaptive', 'LMS Karras', 'DPM2 Karras', 'DPM2 a Karras', 'DPM++ 2M Karras', 'DPM++ SDE Karras',
+            'DDIM', 'PLMS'
+        ]
+default_sampler = 'Euler a'
+
+[blacklist] # blacklisted generation words
+words = ['nsfw', 'nude', 'naked', 'pussy', 'vagina', 'dick', 'cock', 'penis', 'loli', 'shota', 'child', 'children']
+allow_in_negative = true # allow blacklisted words in negative prompt
