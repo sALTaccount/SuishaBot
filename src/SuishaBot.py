@@ -58,7 +58,7 @@ class Bot:
                 event_loop=asyncio.get_event_loop(),
                 ctx=ctx,
                 args={
-                    'sd_model_checkpoint': "nai.ckpt [89d59c3dde]"
+                    'sd_model_checkpoint': model
                 }
             )
             webui.switch_model(queue_obj)
