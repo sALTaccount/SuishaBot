@@ -61,7 +61,11 @@ class Bot:
                     'sd_model_checkpoint': model
                 }
             )
-            webui.switch_model(queue_obj)
+            response, status_code = webui.switch_model(queue_obj)
+            if status_code != 200:
+                await ctx.respond("shits fucked")
+            else:
+                await ctx.respond(response)
 
         @instance.slash_command(name="dream", description="Generate an image")
         @option('prompt', str, description='The prompt for generating the image', required=True)
