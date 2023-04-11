@@ -49,6 +49,20 @@ class Bot:
                         cmd_parts.append(f'{maps[item[0]][0]}: {item[1]}')
             return ' '.join(cmd_parts)
 
+        @instance.slash_command(name="model", description="switch model")
+        @option('model', str, description='model to switch to', required=True)
+        async def model(ctx, *, model: str):
+            webui = AutoWebUi.WebUi("http://127.0.0.1:7860/")
+            print(f'Request -- {ctx.author.name}#{ctx.author.discriminator} -- change model to {model}')
+            queue_obj = AutoWebUi.QueueObj(
+                event_loop=asyncio.get_event_loop(),
+                ctx=ctx,
+                args={
+                    'sd_model_checkpoint': "nai.ckpt [89d59c3dde]"
+                }
+            )
+            webui.switch_model(queue_obj)
+
         @instance.slash_command(name="dream", description="Generate an image")
         @option('prompt', str, description='The prompt for generating the image', required=True)
         @option('negative_prompt', str, description='', required=False)
