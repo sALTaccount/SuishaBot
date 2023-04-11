@@ -50,7 +50,7 @@ class Bot:
             return ' '.join(cmd_parts)
 
         @instance.slash_command(name="model", description="switch model")
-        @option('model', str, description='model to switch to', required=True)
+        @option('model', str, description='model to switch to', required=True, choices=params['models'])
         async def model(ctx, *, model: str):
             webui = AutoWebUi.WebUi("http://127.0.0.1:7860/")
             print(f'Request -- {ctx.author.name}#{ctx.author.discriminator} -- change model to {model}')
