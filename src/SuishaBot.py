@@ -65,7 +65,7 @@ class Bot:
             if status_code != 200:
                 await ctx.respond("shits fucked")
             else:
-                await ctx.respond("idk what this is gonna say:" +response)
+                await ctx.respond("finished switching to "+model)
 
         @instance.slash_command(name="dream", description="Generate an image")
         @option('prompt', str, description='The prompt for generating the image', required=True)
