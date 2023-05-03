@@ -27,10 +27,12 @@ max_steps = 60
 step_step = 5
 
 samplers = [
-            'Euler a', 'Euler', 'LMS', 'Heun', 'DPM2', 'DM2 a', 'DPM++ 2S a', 'DPM++ 2M', 'DPM++ SDE', 'DPM fast',
+            'Euler a', 'Euler', 'LMS', 'Heun', 'DPM2', 'DPM2 a', 'DPM++ 2S a', 'DPM++ 2M', 'DPM++ SDE', 'DPM fast',
             'DPM adaptive', 'LMS Karras', 'DPM2 Karras', 'DPM2 a Karras', 'DPM++ 2M Karras', 'DPM++ SDE Karras',
             'DDIM', 'PLMS'
         ]
+models = ['abyssorangemix3AOM3_aom3a3.safetensors [eb4099ba9c]', 'deliberate_v11.safetensors [d8691b4d16]', 'nai.ckpt [89d59c3dde]']
+
 default_sampler = 'Euler a'
 
 [blacklist] # blacklisted generation words

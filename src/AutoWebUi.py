@@ -25,6 +25,13 @@ class WebUi:
         response = requests.post(url=endpoint, json=payload)
         r = response.json()
         return r, response.status_code
+    
+    def switch_model(self, queue_obj):
+        endpoint = urljoin(self._base_url, '/sdapi/v1/options')
+        payload = queue_obj.args
+        response = requests.post(url=endpoint, json=payload)
+        r = response.json()
+        return r, response.status_code
 
     def heartbeat(self):
         endpoint = urljoin(self._base_url, '/user/')
